@@ -15,12 +15,12 @@ In this project we dive into the world of genetic algorithms and investigate whe
 ## Usage
 To run the project 
 ```sh
-   python main.py
+   python .\main.py
 ```
 
 To train the model (returns .pth file for loading)
 ```sh
-   python train.py
+   python .\train.py
 ```
 
 [PyTorch.org]: https://img.shields.io/badge/PyTorch-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white
