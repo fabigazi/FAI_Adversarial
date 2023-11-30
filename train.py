@@ -50,3 +50,5 @@ with torch.no_grad():
 
 correct /= len(test_loader.dataset)
 print(f"Accuracy on test: {(100*correct):>0.1f}%")
+
+torch.save(model.state_dict(), "model_1.pth")
