@@ -6,6 +6,7 @@ from torch.utils.data import DataLoader
 from torchvision import datasets
 from torchvision import transforms
 from target_model import TargetModel
+import numpy as np
 
 def PGD(model, image, label, epsilon, iterations, alpha):
 
@@ -22,6 +23,7 @@ def PGD(model, image, label, epsilon, iterations, alpha):
 		with torch.no_grad():
 			perturbed_image.data = perturbed_image.data + alpha * perturbed_image.grad.sign()
 			perturbed_image.data = torch.clamp(perturbed_image.data, image.data - epsilon, image.data + epsilon)
+			#perturbed_image = torch.clamp(perturbed_image, 0, 1)
 
 		perturbed_image.grad.zero_()
 
@@ -42,18 +44,21 @@ train_loader = DataLoader(train, batch_size=64, shuffle=True)
 # print(max(train[0][0].flatten()))
 target_model = TargetModel(model)
 
-epsilon = 0.05
-iterations = 500
-alpha = 2/255
+epsilon = 2./255
+iterations = 50
+alpha = 0.05
 
-results = []
 
 for batch, (X, y) in enumerate(train_loader):
+	original = X
 	attack = PGD(model, X, y, epsilon, iterations, alpha)
-	results.append(attack)
 	break
 
-print(results[0][0].shape)
+
+noise = original[0][0] - attack[0][0]
+fitness = 50 - (0.5 * np.linalg.norm(noise.detach().numpy()))
+
+print(fitness)
 
 fig = plt.figure()
 ax = fig.add_subplot(1, 2, 1)

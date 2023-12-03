@@ -25,17 +25,17 @@ class Magma:
         population_size: int,
         sample_shape: Tuple,
         num_evolutions: int,
-        beta: float = 0.7,
-        epsilon: float = 30.0 / 255,
+        beta: float = 0.5,
+        epsilon: float = 25.0 / 255,
     ) -> None:
         self.population_size = population_size
         self.sample_shape = sample_shape
         self.num_evolutions = num_evolutions
         self.beta = beta
         self.epsilon = epsilon
-        self.parent_selection_rate = 0.10
-        self.inheritance_rate = 0.6
-        self.mutation_rate = 0.05
+        self.parent_selection_rate = 0.2
+        self.inheritance_rate = 0.7
+        self.mutation_rate = 0.01
         self.population = self.initialize_population()
 
     def generate_candidate(self):
@@ -187,7 +187,7 @@ target_model = TargetModel(model)
 print(target_model.predict(train[0][0]))
 # print(model(train[0][0].unsqueeze(0)).max(dim=1)[1].item())
 
-attack = Magma(500, train[0][0].shape, 100)
+attack = Magma(100, train[0][0].shape, 100)
 attack_result = attack.attack(train[0][0], target_model)
 
 # attack = Magma(20, transforms.ToTensor()(sample_img).shape, 1000)
