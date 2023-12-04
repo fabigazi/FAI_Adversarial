@@ -39,13 +39,8 @@ attack = SaliencyMapMethod(classifier, theta=0.1, gamma=1.0, batch_size=1, verbo
 for batch, (X, y) in enumerate(train_loader):
     original = X.numpy()
     out = attack.generate(x=original, eps=epsilon)
-    # print("Y")
-    # print(y.numpy[0])
     perturbed_image = torch.tensor(out)
     break
-print(sum(out[0][0]))
-print(sum(original[0][0]))
-print(sum(out[0][0]) == sum(original[0][0]))
 noise = perturbed_image[0] - torch.tensor(original[0][0])
 # print(noise)
 fitness = 50 - (0.5 * np.linalg.norm(noise.detach().numpy()))
