@@ -54,8 +54,12 @@ for batch, (X, y) in enumerate(train_loader):
 	attack = PGD(model, X, y, epsilon, iterations, alpha)
 	break
 
+print(sum(attack[0][0]))
+print(sum(original[0][0]))
+print(sum(attack[0][0]) == sum(original[0][0]))
+
 #change this to try different examples by their index.
-figure_ind = 3
+figure_ind = 6
 
 noise = original[figure_ind][0] - attack[figure_ind][0]
 fitness = 50 - (0.5 * np.linalg.norm(noise.detach().numpy()))

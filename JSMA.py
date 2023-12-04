@@ -39,7 +39,7 @@ attack = SaliencyMapMethod(classifier, theta=0.01, gamma=1.0, batch_size=1, verb
 
 for batch, (X, y) in enumerate(train_loader):
     original = X.numpy()
-    out = attack.generate(x=original, y=y.numpy(), eps=epsilon)
+    out = attack.generate(x=original, eps=epsilon)
     perturbed_image = torch.tensor(out)
     break
 print(sum(out[0][0]))
