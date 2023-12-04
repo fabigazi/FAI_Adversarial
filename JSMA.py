@@ -32,30 +32,28 @@ train_loader = DataLoader(train, batch_size=64, shuffle=True)
 
 target_model = TargetModel(model)
 
-epsilon = 2./255
+epsilon = 1./255
 
-attack = SaliencyMapMethod(classifier, theta=0.1, gamma=1.0, batch_size=1, verbose=True)
+
+attack = SaliencyMapMethod(classifier, theta=0.01, gamma=1.0, batch_size=1, verbose=True)
 
 for batch, (X, y) in enumerate(train_loader):
     original = X.numpy()
-    out = attack.generate(x=original, y=y.numpy(), eps=epsilon)
+    out = attack.generate(x=original, eps=epsilon)
     perturbed_image = torch.tensor(out)
-    # with torch.no_grad():
-    #     original_output = target_model.predict(torch.tensor(original[0][0]))
-    #     perturbed_output = target_model.predict(original[0][0] + perturbed_image[0][0].detach().numpy())
-    # print("Original Predicted Class:", original_output)
-    # print("Perturbed Predicted Class:", perturbed_output)
     break
+print(sum(out[0][0]))
+print(sum(original[0][0]))
+print(sum(out[0][0]) == sum(original[0][0]))
 
-noise = torch.tensor(original[0][0]) - perturbed_image[0][0]
-# if torch.tensor(original[0][0]) == perturbed_image[0][0]:
-#     print("sfvusvj")
+noise = perturbed_image[0][0] - torch.tensor(original[0][0])
 
 # print(noise)
 fitness = 50 - (0.5 * np.linalg.norm(noise.detach().numpy()))
 print(fitness)
 
 newimage = train[0][0] + perturbed_image[0][0].detach().numpy()
+# 
 fig = plt.figure()
 ax = fig.add_subplot(1, 2, 1)
 ax.imshow(train[0][0].squeeze(0), cmap="gray")
