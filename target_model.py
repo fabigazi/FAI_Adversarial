@@ -26,3 +26,8 @@ class TargetModel:
         # pred = self.model(normalizer(sample_image_tensor))
         pred = self.model(sample.unsqueeze(0))
         return pred.max(dim=1)[1].item()
+
+    def predict_logits(self, sample):
+        self.model.eval()
+        pred = self.model(sample.unsqueeze(0))
+        return pred[0].detach().numpy()
