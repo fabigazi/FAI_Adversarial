@@ -26,7 +26,7 @@ class Magma:
         sample_shape: Tuple,
         num_evolutions: int,
         beta: float = 0.5,
-        epsilon: float = 25.0 / 255,
+        epsilon: float = 30.0 / 255,
     ) -> None:
         self.population_size = population_size
         self.sample_shape = sample_shape
@@ -187,7 +187,7 @@ target_model = TargetModel(model)
 print(target_model.predict(train[0][0]))
 # print(model(train[0][0].unsqueeze(0)).max(dim=1)[1].item())
 
-attack = Magma(100, train[0][0].shape, 100)
+attack = Magma(100, train[0][0].shape, 50)
 attack_result = attack.attack(train[0][0], target_model)
 
 # attack = Magma(20, transforms.ToTensor()(sample_img).shape, 1000)
