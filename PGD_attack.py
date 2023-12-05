@@ -7,6 +7,9 @@ from torchvision import datasets
 from torchvision import transforms
 from target_model import TargetModel
 import numpy as np
+import imageio
+
+gif_images = torch.tensor([])
 
 gif_images = []
 
@@ -16,7 +19,7 @@ def PGD(model, image, label, epsilon, iterations, alpha):
 	gif_images.append(perturbed_image[0].detach().numpy())
 
 	for i in range(iterations):
-		# gif_images = torch.cat((gif_images, perturbed_image[0]), 0)		
+		# gif_images = torch.cat((gif_images, perturbed_image[0]), 0)
 		criterion = nn.CrossEntropyLoss()
 		output = model(perturbed_image)
 
