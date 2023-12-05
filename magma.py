@@ -14,7 +14,7 @@ import warnings
 from torchvision import datasets
 from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
-
+from tqdm import tqdm
 
 warnings.filterwarnings("ignore")
 
@@ -39,7 +39,7 @@ class Magma:
         print(self.sample_shape)
         self.parent_selection_rate = 0.2
         self.inheritance_rate = 0.85
-        self.mutation_rate = 0.2
+        self.mutation_rate = 0.3
         self.max_norm = np.linalg.norm(np.full(fill_value=1, shape=self.sample_shape))
         self.targeted = targeted
         self.population = self.initialize_population()
@@ -125,9 +125,12 @@ class Magma:
         return new_candidate
 
     def attack(self, victim_sample, target_model, target_class=None):
+        # pbar = tqdm(total=self.num_evolutions)
+        # for e in pbar:
         for e in range(1, self.num_evolutions + 1):
-            print("Evolution: ", e)
-            if e % 500 == 0:
+            if e % 100 == 0:
+                print("Evolution: ", e)
+            if e % 250 == 0:
                 self.epsilon = self.epsilon * 0.95
             fitnesses = []
             if self.targeted:
@@ -145,7 +148,11 @@ class Magma:
             fit_candidates_indices = self.select_top_k(
                 fitnesses, int(self.population_size * self.parent_selection_rate)
             )
-            print([fitnesses[x] for x in fit_candidates_indices][-10:])
+            # print([fitnesses[x] for x in fit_candidates_indices][-10:])
+            if e % 100 == 0:
+                print(
+                    "Evolution: ", e, "Fittest: ", fitnesses[fit_candidates_indices[-1]]
+                )
             fit_candidates = [self.population[fc] for fc in fit_candidates_indices]
             new_population = self.generate_new_population_from_fit_candidates(
                 fit_candidates, self.population_size - len(fit_candidates)
@@ -176,30 +183,30 @@ train = datasets.MNIST(
     download=True,
     transform=transforms.Compose([transforms.Resize((32, 32)), transforms.ToTensor()]),
 )
-train_loader = DataLoader(train, batch_size=64, shuffle=True)
+# train_loader = DataLoader(train, batch_size=64, shuffle=True)
 
 target_model = TargetModel(model)
-print(target_model.predict_logits(train[0][0]))
+# print(target_model.predict_logits(train[0][0]))
 # print(model(train[0][0].unsqueeze(0)))
 
-select_idx = np.random.randint(0, len(train))
-attack = Magma(100, train[select_idx][0].shape, 5000)
+select_idx = 0
+attack = Magma(500, train[select_idx][0].shape, 5000)
 attack_result = attack.attack(train[select_idx][0], target_model, 6)
 
 
-fig = plt.figure()
-ax = fig.add_subplot(1, 2, 1)
-ax.imshow(train[select_idx][0].squeeze(0), cmap="gray")
-ax.set_title("Original Image " + "pred: " + str(target_model.predict(train[0][0])))
-ax = fig.add_subplot(1, 2, 2)
-ax.imshow((train[select_idx][0] + attack_result).squeeze(0), cmap="gray")
-ax.set_title(
-    "Poisoned Image "
-    + "pred: "
-    + str(target_model.predict(train[select_idx][0] + attack_result))
-)
-plt.show()
+# fig = plt.figure()
+# ax = fig.add_subplot(1, 2, 1)
+# ax.imshow(train[select_idx][0].squeeze(0), cmap="gray")
+# ax.set_title("Original Image " + "pred: " + str(target_model.predict(train[0][0])))
+# ax = fig.add_subplot(1, 2, 2)
+# ax.imshow((train[select_idx][0] + attack_result).squeeze(0), cmap="gray")
+# ax.set_title(
+#     "Poisoned Image "
+#     + "pred: "
+#     + str(target_model.predict(train[select_idx][0] + attack_result))
+# )
+# plt.show()
 
-print(target_model.predict(train[select_idx][0] + attack_result))
-print(target_model.predict_logits(train[select_idx][0] + attack_result))
-print(attack.fitness_untargetted(attack_result, train[select_idx][0], target_model))
+# print(target_model.predict(train[select_idx][0] + attack_result))
+# print(target_model.predict_logits(train[select_idx][0] + attack_result))
+# print(attack.fitness_untargetted(attack_result, train[select_idx][0], target_model))
