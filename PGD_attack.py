@@ -28,12 +28,13 @@ def PGD(model, image, label, epsilon, iterations, alpha):
 
 		with torch.no_grad():
 			perturbed_image.data = perturbed_image.data + alpha * perturbed_image.grad.sign()
+			new_noise = (torch.clamp(perturbed_image.data, image.data - epsilon, image.data + epsilon) - image.clone().detach())*2
 			perturbed_image.data = torch.clamp(perturbed_image.data, image.data - epsilon, image.data + epsilon)
 			#perturbed_image = torch.clamp(perturbed_image, 0, 1)
 
 		perturbed_image.grad.zero_()
 		perturbed_image[0][0]
-		gif_images.append(perturbed_image[0].detach().numpy())
+		gif_images.append(image[0].detach().numpy() + new_noise[0].detach().numpy())
 
 	return perturbed_image
 
@@ -52,9 +53,9 @@ train_loader = DataLoader(train, batch_size=64, shuffle=False)
 # print(max(train[0][0].flatten()))
 target_model = TargetModel(model)
 
-epsilon = 0.05
+epsilon = 25./255 #0.05
 iterations = 50
-alpha = 2./255
+alpha = 0.01 #2./255
 print(len(train_loader) * 64)
 i = 0
 
