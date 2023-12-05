@@ -13,8 +13,8 @@ gif_images = torch.tensor([])
 
 gif_images = []
 
-def PGD(model, image, label, epsilon, iterations, alpha):
 
+def PGD(model, image, label, epsilon, iterations, alpha):
 	perturbed_image = image.clone().detach().requires_grad_(True)
 	gif_images.append(perturbed_image[0].detach().numpy())
 
@@ -22,7 +22,6 @@ def PGD(model, image, label, epsilon, iterations, alpha):
 		# gif_images = torch.cat((gif_images, perturbed_image[0]), 0)
 		criterion = nn.CrossEntropyLoss()
 		output = model(perturbed_image)
-
 		loss = criterion(output, label)
 		loss.backward()
 
@@ -100,4 +99,3 @@ ax.set_title(
     + str(target_model.predict(new_dataset[figure_ind]))
 )
 plt.show()
-
