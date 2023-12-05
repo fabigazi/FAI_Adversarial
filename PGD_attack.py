@@ -7,12 +7,16 @@ from torchvision import datasets
 from torchvision import transforms
 from target_model import TargetModel
 import numpy as np
+import imageio
+
+gif_images = torch.tensor([])
 
 def PGD(model, image, label, epsilon, iterations, alpha):
 
 	perturbed_image = image.clone().detach().requires_grad_(True)
 
 	for i in range(iterations):
+		gif_images = torch.cat((gif_images, perturbed_image[0]), 0)
 		criterion = nn.CrossEntropyLoss()
 
 		output = model(perturbed_image)
@@ -60,6 +64,8 @@ for batch, (X, y) in enumerate(train_loader):
 	print(i)
 	if i > 10:
 		break
+
+
 	
 # Andrew use this!
 gif_images = new_dataset.detach().numpy()
