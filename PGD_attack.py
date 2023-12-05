@@ -57,12 +57,19 @@ for batch, (X, y) in enumerate(train_loader):
 	attack = PGD(model, X, y, epsilon, iterations, alpha)
 	new_dataset = torch.cat((new_dataset, attack),0)
 	i += 1
-	print(i)
+	# print(i)
 	if i > 10:
 		break
 	
 # Andrew use this!
 gif_images = new_dataset.detach().numpy()
+
+# convert images to GIF
+from PIL import Image
+print(gif_images[0])
+imgs = [Image.fromarray(np.squeeze(img.transpose(1, 2, 0), axis=2) * 255) for img in gif_images]
+imgs[0].save("pgd.gif", save_all=True, append_images=imgs[1:], duration=50, loop=1)
+
 
 #change this to try different examples by their index.
 figure_ind = 6
