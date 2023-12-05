@@ -33,15 +33,17 @@ train_loader = DataLoader(train, batch_size=64, shuffle=False)
 target_model = TargetModel(model)
 
 epsilon = 2./255
-
 attack = SaliencyMapMethod(classifier, theta=0.1, gamma=1.0, batch_size=1, verbose=True)
+
 
 for batch, (X, y) in enumerate(train_loader):
     original = X.numpy()
     out = attack.generate(x=original, eps=epsilon)
     perturbed_image = torch.tensor(out)
     break
+
 noise = perturbed_image[0] - torch.tensor(original[0][0])
+
 # print(noise)
 fitness = 50 - (0.5 * np.linalg.norm(noise.detach().numpy()))
 print(fitness)

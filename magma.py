@@ -38,8 +38,8 @@ class Magma:
         print(self.population_size)
         print(self.sample_shape)
         self.parent_selection_rate = 0.2
-        self.inheritance_rate = 0.4
-        self.mutation_rate = 0.05
+        self.inheritance_rate = 0.85
+        self.mutation_rate = 0.2
         self.max_norm = np.linalg.norm(np.full(fill_value=1, shape=self.sample_shape))
         self.targeted = targeted
         self.population = self.initialize_population()
@@ -86,10 +86,12 @@ class Magma:
         pred_base = target_model.predict(victim_sample)
         pred_poison_logits = target_model.predict_logits(poison_sample + victim_sample)
         # pred_base_logits = target_model.predict_logits(victim_sample)
-        missclassification_score = (
-            np.abs(1 - pred_poison_logits[pred_base])
-            + np.abs(pred_poison_logits[target_class])
-        ) / 2
+        # missclassification_score = (
+        #     np.abs(1 - pred_poison_logits[pred_base])
+        #     + np.abs(pred_poison_logits[target_class])
+        # ) / 2
+        missclassification_score = np.abs(pred_poison_logits[target_class])
+
         poison_magnitude = np.linalg.norm(poison_sample) / self.max_norm
         fitness = (self.beta * missclassification_score) - (
             (1 - self.beta) * poison_magnitude
@@ -180,9 +182,8 @@ target_model = TargetModel(model)
 print(target_model.predict_logits(train[0][0]))
 # print(model(train[0][0].unsqueeze(0)))
 
-select_idx = 10
-
-attack = Magma(100, train[select_idx][0].shape, 5000, targeted=True)
+select_idx = np.random.randint(0, len(train))
+attack = Magma(100, train[select_idx][0].shape, 5000)
 attack_result = attack.attack(train[select_idx][0], target_model, 6)
 
 

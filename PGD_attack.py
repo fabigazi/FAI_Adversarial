@@ -39,14 +39,14 @@ train = datasets.MNIST(
     download=True,
     transform=transforms.Compose([transforms.Resize((32, 32)), transforms.ToTensor()]),
 )
-train_loader = DataLoader(train, batch_size=64, shuffle=True)
+train_loader = DataLoader(train, batch_size=64, shuffle=False)
 
 # print(max(train[0][0].flatten()))
 target_model = TargetModel(model)
 
-epsilon = 2./255
+epsilon = 0.05
 iterations = 50
-alpha = 0.05
+alpha = 2./255
 
 
 for batch, (X, y) in enumerate(train_loader):
@@ -54,22 +54,29 @@ for batch, (X, y) in enumerate(train_loader):
 	attack = PGD(model, X, y, epsilon, iterations, alpha)
 	break
 
+print(sum(attack[0][0]))
+print(sum(original[0][0]))
+print(sum(attack[0][0]) == sum(original[0][0]))
 
-noise = original[0][0] - attack[0][0]
+#change this to try different examples by their index.
+figure_ind = 6
+
+noise = original[figure_ind][0] - attack[figure_ind][0]
 fitness = 50 - (0.5 * np.linalg.norm(noise.detach().numpy()))
 
 print(fitness)
 
+
 fig = plt.figure()
 ax = fig.add_subplot(1, 2, 1)
-ax.imshow(train[0][0].squeeze(0), cmap="gray")
-ax.set_title("Original Image " + "pred: " + str(target_model.predict(train[0][0])))
+ax.imshow(train[figure_ind][0].squeeze(0), cmap="gray")
+ax.set_title("Original Image " + "pred: " + str(target_model.predict(train[figure_ind][0])))
 ax = fig.add_subplot(1, 2, 2)
-ax.imshow((train[0][0] + attack[0][0].detach().numpy()).squeeze(0), cmap="gray")
+ax.imshow((attack[figure_ind][0].detach().numpy()), cmap="gray")
 ax.set_title(
     "Poisoned Image "
     + "pred: "
-    + str(target_model.predict(train[0][0] + attack[0][0].detach().numpy()))
+    + str(target_model.predict(attack[figure_ind]))
 )
 plt.show()
 
