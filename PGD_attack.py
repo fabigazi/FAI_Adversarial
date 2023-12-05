@@ -8,13 +8,16 @@ from torchvision import transforms
 from target_model import TargetModel
 import numpy as np
 
+gif_images = []
+
 def PGD(model, image, label, epsilon, iterations, alpha):
 
 	perturbed_image = image.clone().detach().requires_grad_(True)
+	gif_images.append(perturbed_image[0].detach().numpy())
 
 	for i in range(iterations):
+		# gif_images = torch.cat((gif_images, perturbed_image[0]), 0)		
 		criterion = nn.CrossEntropyLoss()
-
 		output = model(perturbed_image)
 
 		loss = criterion(output, label)
@@ -27,6 +30,7 @@ def PGD(model, image, label, epsilon, iterations, alpha):
 
 		perturbed_image.grad.zero_()
 		perturbed_image[0][0]
+		gif_images.append(perturbed_image[0].detach().numpy())
 
 	return perturbed_image
 
@@ -56,19 +60,19 @@ for batch, (X, y) in enumerate(train_loader):
 	original = X
 	attack = PGD(model, X, y, epsilon, iterations, alpha)
 	new_dataset = torch.cat((new_dataset, attack),0)
-	i += 1
-	# print(i)
-	if i > 10:
-		break
+	# i += 1
+	# # print(i)
+	# if i > 10:
+	# 	break
+	break
 	
 # Andrew use this!
-gif_images = new_dataset.detach().numpy()
+# gif_images = gif_images.detach().numpy()
 
 # convert images to GIF
 from PIL import Image
-print(gif_images[0])
 imgs = [Image.fromarray(np.squeeze(img.transpose(1, 2, 0), axis=2) * 255) for img in gif_images]
-imgs[0].save("pgd.gif", save_all=True, append_images=imgs[1:], duration=50, loop=1)
+imgs[0].save("pgd_progress.gif", save_all=True, append_images=imgs[1:], duration=150, loop=100)
 
 
 #change this to try different examples by their index.
