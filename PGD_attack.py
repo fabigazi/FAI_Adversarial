@@ -14,7 +14,7 @@ gif_images = torch.tensor([])
 gif_images = []
 
 
-def PGD(model, image, label, epsilon, iterations, alpha):
+def PGD(model, image, label, epsilon=25./255, iterations=50, alpha=0.01):
 	perturbed_image = image.clone().detach().requires_grad_(True)
 	gif_images.append(perturbed_image[0].detach().numpy())
 
